@@ -7,17 +7,14 @@ import model.Job;
 import model.Scheduler;
 
 public class Processor extends Thread {
-	private Scheduler scheduler;
+	private Clock clock;
 	private List<Job> jobList;
 	
-	public Processor(Scheduler scheduler, List<Job> jobList) {
-		this.scheduler = scheduler;
-		this.jobList = jobList;
+	public Processor(Clock clock) {
+		this.clock = clock;
 	}
 	
 	public void run() {
-		scheduler.start();
-		
 		
 	}
 }
