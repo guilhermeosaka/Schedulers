@@ -1,11 +1,11 @@
 package model;
 
-import java.util.Queue;
+import java.util.List;
 
 public class ShortestJobFirst extends Scheduler {
 
 	@Override
-	public synchronized void schedule(Job job) {
+	public synchronized void schedule(List<Job> fresh) {
 		// TODO Auto-generated method stub
 		
 	}

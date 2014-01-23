@@ -35,7 +35,7 @@ public class Job {
 	public void run() throws InterruptedException {
 		state = State.Running;
 		while (state == State.Running) {
-			Thread.sleep(1000);
+			Thread.sleep(Watch.remaining());
 			cycle++;
 			if (cycle == lifespan) {
 				state = State.Terminated;

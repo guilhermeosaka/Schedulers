@@ -11,6 +11,10 @@ public class Watch {
 	}
 	
 	public static int getTime() {
-		return (int)((new Date().getTime()) - started);
+		return (int)((new Date().getTime()) % started);
+	}
+	
+	public static int remaining() {
+		return Math.abs(getTime() % 1000 - 1000);
 	}
 }

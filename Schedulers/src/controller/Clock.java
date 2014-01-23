@@ -1,8 +1,11 @@
 package controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import model.Job;
 import model.Scheduler;
@@ -10,7 +13,7 @@ import model.Watch;
 
 public class Clock extends Thread {
 	private Scheduler scheduler;
-	private List<Job> jobList;
+	private List<Job> jobs;
 	
 	public Clock(Scheduler scheduler, List<Job> jobList) {
 		this.scheduler = scheduler;
@@ -24,7 +27,7 @@ public class Clock extends Thread {
 			}
 		});
 		
-		this.jobList = jobList;
+		jobs = jobList;
 		
 		for (Job job : jobList) {
 			job.setScheduler(scheduler);
@@ -32,22 +35,32 @@ public class Clock extends Thread {
 	}
 	
 	public void run() {
-		synchronized (this) {
-			while (!jobList.isEmpty()) { 
+		synchronized (this) { 
+			int seconds = 0;
+			while (!jobs.isEmpty()) {
 				try {
-					Job job = jobList.remove(0);
-					int sleepTime = job.getSpawn() * 1000 - Watch.getTime();
-					if (sleepTime < 0)
-						sleepTime = 0;
-					sleep(sleepTime);
-					scheduler.schedule(job);
+					scheduler.schedule(spawn(seconds));
+					seconds++;
+					sleep(Watch.remaining());
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.out.println("ERRO");
 				}
 				
 				notifyAll();
 			}
 		}
+	}
+	
+	public List<Job> spawn(int seconds) {
+		boolean stop = false;
+		List<Job> fresh = new LinkedList<>();
+		while (!stop && !jobs.isEmpty()) {
+			if (jobs.get(0).getSpawn() == seconds)
+				fresh.add(jobs.remove(0));
+			else
+				stop = true;
+		}
+		System.out.println("nasceu");
+		return fresh;
 	}
 }

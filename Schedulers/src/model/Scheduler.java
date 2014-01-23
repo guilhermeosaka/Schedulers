@@ -6,7 +6,7 @@ import java.util.Queue;
 
 public abstract class Scheduler {
 	Job job;
-	List<Job> runnable;
+	Queue<Job> runnable;
 	List<Job> terminated;
 	List<Job> waiting; 
 	
@@ -15,7 +15,7 @@ public abstract class Scheduler {
 		this.terminated = new LinkedList<>();
 	}
 	
-	public abstract void schedule(Job job) throws InterruptedException;
+	public abstract void schedule(List<Job> job) throws InterruptedException;
 	
 	public abstract Job getJob() throws InterruptedException;
 	
@@ -25,7 +25,7 @@ public abstract class Scheduler {
 		return runnable.remove(job);
 	}
 	
-	public synchronized List<Job> getRunnable() {
+	public synchronized Queue<Job> getRunnable() {
 		return runnable;
 	}
 	
