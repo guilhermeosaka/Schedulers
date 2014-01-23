@@ -11,6 +11,7 @@ import model.Watch;
 import view.View;
 
 public class Controller extends Thread {
+	public final static int SYNCHRONIZE = 50;
 	private Model model;
 	private View view;
 	
@@ -35,25 +36,31 @@ public class Controller extends Thread {
 			//Grava log e mostra na tela
 			System.out.println(e.getMessage());
 		}
-		
-		Watch.start();
-		processor.get(3).start();
-		clock.get(3).start();
 	}
 	
 	public void run() {
+		Watch.start();
+		processor.get(3).start();
+		clock.get(3).start();
 		while (true) {
-			if (Watch.getTime() % 500 == 0) {
-				System.out.print(Watch.getTime() / 1000 + " - ");
-				String message;
-				if (processor.get(3).getJob() != null) 
-					message = Integer.toString(processor.get(3).getJob().getId());
-				else
-					message = "Não há processos";
-				System.out.println(message);
-			}
+			StringBuilder log = new StringBuilder();
+			log.append("[");
+			log.append(displayTime(Watch.getTime()));
+			log.append("] - ");
+			
 			try {
-				sleep(1);
+				sleep(SYNCHRONIZE);
+				
+				Job job = processor.get(3).getJob();
+				
+				if (job == null) {
+					log.append("Não há processos");
+				} else {
+					log.append("Processando Job " + job.getId());
+				}
+				
+				System.out.println(log);
+				sleep(Watch.getAmount());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -70,7 +77,22 @@ public class Controller extends Thread {
 			p.start();
 	}
 	
-	public void pause() {
+	public String displayTime(int time) {
+		if (time == 0)
+			return "0:00";
 		
+		int seconds = time % 60;
+		int minutes = time / 60;
+		
+		StringBuilder result = new StringBuilder();
+		
+		result.append(minutes);
+		result.append(":");
+		if (seconds < 10)
+			result.append("0" + seconds);
+		else
+			result.append(seconds);
+		
+		return result.toString();
 	}
 }

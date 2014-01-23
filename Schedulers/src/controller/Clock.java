@@ -36,12 +36,10 @@ public class Clock extends Thread {
 	
 	public void run() {
 		synchronized (this) { 
-			int seconds = 0;
 			while (!jobs.isEmpty()) {
 				try {
-					scheduler.schedule(spawn(seconds));
-					seconds++;
-					sleep(Watch.remaining());
+					scheduler.schedule(spawn(Watch.getTime()));
+					sleep(Watch.getAmount());
 				} catch (InterruptedException e) {
 					System.out.println("ERRO");
 				}
@@ -60,7 +58,7 @@ public class Clock extends Thread {
 			else
 				stop = true;
 		}
-		System.out.println("nasceu");
+		
 		return fresh;
 	}
 }

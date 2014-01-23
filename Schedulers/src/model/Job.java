@@ -1,20 +1,23 @@
 package model;
 
+import controller.Controller;
+
 
 public class Job {
 	//Lock para sincronizar os jobs
 	private Scheduler scheduler;
 	
-	//Atributos do job
+	//Atributos
 	private final int id;
 	private final int spawn;
 	private int lifespan;
 	private final int priority;
-	private int started;
-	private int finished;
-	private State state;
+	
+	//Propriedades
+	private int birth;
+	private int died;
 	private int age;
-	private int cycle;
+	private State state;
 	
 	public enum State {
 		New,
@@ -29,17 +32,20 @@ public class Job {
 		this.spawn = spawn;
 		this.lifespan = lifespan;
 		this.priority = priority;
-		this.cycle = 0;
+		this.age = 0;
 	}
 	
 	public void run() throws InterruptedException {
+		if (state == State.New){
+			birth = Watch.getTime();
+		}
 		state = State.Running;
 		while (state == State.Running) {
-			Thread.sleep(Watch.remaining());
-			cycle++;
-			if (cycle == lifespan) {
+			Thread.sleep(Watch.getAmount() + Controller.SYNCHRONIZE);
+			age++;
+			if (age == lifespan) {
 				state = State.Terminated;
-				System.out.println("Terminou");
+				died = Watch.getTime();
 			}
 		}
 	}
@@ -64,20 +70,37 @@ public class Job {
 		return this.priority;
 	}
 	
-	public void setState(State state) {
-		this.state = state;
+	public int getBirth() {
+		return this.birth;
+	}
+	
+	public int getDied() {
+		return this.died;
+	}
+	
+	public int getAge() {
+		return this.age;
+	}
+	
+	public boolean isNew() {
+		if (this.state == State.New)
+			return true;
+		else
+			return false;
 	}
 	
 	public boolean isRunning() {
-		if (Watch.getTime() - started > lifespan) {
-			this.state = State.Terminated;
+		if (this.state == State.Running)
+			return true;
+		else
 			return false;
-		} else {
-			if (this.state == State.Running)
-				return true;
-			else
-				return false;
-		}
+	}
+
+	public boolean isWaiting() {
+		if (this.state == State.Waiting)
+			return true;
+		else
+			return false;		
 	}
 	
 	public boolean isTerminated() {
@@ -85,19 +108,6 @@ public class Job {
 			return true;
 		else 
 			return false;
-		
-	}
-	
-	public boolean isWaiting() {
-		if (this.state == State.Waiting)
-			return true;
-		else
-			return false;
-				
-	}
-	
-	public void getOlder(int age) {
-		this.age += age;
 	}
 	
 	public void pause() {
