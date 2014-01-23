@@ -1,43 +1,30 @@
 package model;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class Model {
-	private Scheduler firstComeFirstServed;
-	private Scheduler shortestJobFirst;
-	private Scheduler fixedPriority;
-	private Scheduler fixedPriorityPreemptive;
-	private Scheduler roundRobin;
+	private List<Scheduler> schedulerList;
 	
 	public Model() {
-		firstComeFirstServed = new FirstComeFirstServed();
-		shortestJobFirst = new ShortestJobFirst();
-		fixedPriority = new FixedPriority(false);
-		fixedPriorityPreemptive = new FixedPriority(true);
-		roundRobin = new RoundRobin();
-	}
-
-	public Scheduler getFirstComeFirstServed() {
-		return firstComeFirstServed;
-	}
-
-	public Scheduler getShortestJobFirst() {
-		return shortestJobFirst;
-	}
-
-	public Scheduler getFixedPriority() {
-		return fixedPriority;
-	}
-
-	public Scheduler getFixedPriorityPreemptive() {
-		return fixedPriorityPreemptive;
-	}
-
-	public Scheduler getRoundRobin() {
-		return roundRobin;
+		schedulerList = Arrays.asList(new Scheduler[] { new FirstComeFirstServed(),
+														new ShortestJobFirst(),
+														new FixedPriority(false),
+														new FixedPriority(true),
+														new RoundRobin(false, 2),
+														new RoundRobin(true, 5) });
 	}
 	
-	public List<Job> getJobList() {
-		return null; //Lê um arquivo conforme o requisito
+	public List<Scheduler> getSchedulerList() {
+		return this.schedulerList;
+	}
+	
+	public List<Job> getJobList(String path) throws IOException {
+		JobReader reader = new JobReader(path);
+		List<Job> jobList = reader.getJobList();
+		reader.close();
+		
+		return jobList;
 	}
 }
