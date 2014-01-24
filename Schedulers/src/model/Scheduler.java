@@ -15,11 +15,31 @@ public abstract class Scheduler {
 		this.terminated = new LinkedList<>();
 	}
 	
+	//Enfileira a job na fila 'runnable'. As interrupções (Job.pause()) dos jobs são realizadas no escopo deste método.
 	public abstract void schedule(List<Job> job) throws InterruptedException;
 	
-	public abstract Job getJob() throws InterruptedException;
+	//Obtém o primeiro job da fila 'runnable', e deve excluir se estiver com status de "TERMINATED"
+	public Job getJob() throws InterruptedException {
+		synchronized (this) {
+			while (runnable.isEmpty()) {
+				wait();
+			}
+			
+			Job job = runnable.peek();
+			
+			if (job.isTerminated()) {
+				runnable.remove(job);
+				job = null;
+			}
+			
+			notify();
+			return job;
+		}
+	}
 	
-	public abstract boolean isEmpty();
+	public boolean isEmpty() {
+		return runnable.isEmpty();
+	}
 	
 	public boolean remove(Job job) {
 		return runnable.remove(job);
@@ -32,4 +52,6 @@ public abstract class Scheduler {
 	public synchronized List<Job> getTerminated() {
 		return terminated;
 	}
+	
+	public abstract Queue<Job> merge(Queue<Job> old, List<Job> fresh);
 }

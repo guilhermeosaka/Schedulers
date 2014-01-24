@@ -4,13 +4,10 @@ import controller.Controller;
 
 
 public class Job {
-	//Lock para sincronizar os jobs
-	private Scheduler scheduler;
-	
 	//Atributos
 	private final int id;
 	private final int spawn;
-	private int lifespan;
+	private final int lifespan;
 	private final int priority;
 	
 	//Propriedades
@@ -19,13 +16,15 @@ public class Job {
 	private int age;
 	private State state;
 	
+	//Estados que a job pode possuir
 	public enum State {
-		New,
-		Running,
-		Waiting,
-		Terminated
+		NEW,
+		RUNNING,
+		WAITING,
+		TERMINATED
 	}
 	
+	//Construtor passando os atributos da job
 	public Job(int id, int spawn, int lifespan, int priority) {
 		super();
 		this.id = id;
@@ -33,25 +32,23 @@ public class Job {
 		this.lifespan = lifespan;
 		this.priority = priority;
 		this.age = 0;
+		state = State.NEW;
 	}
 	
+	//Método invocado pelo 'processor' para 'executar' a job
 	public void run() throws InterruptedException {
-		if (state == State.New){
+		if (state == State.NEW) {
 			birth = Watch.getTime();
 		}
-		state = State.Running;
-		while (state == State.Running) {
+		state = State.RUNNING;
+		while (state == State.RUNNING) {
 			Thread.sleep(Watch.getAmount() + Controller.SYNCHRONIZE);
 			age++;
 			if (age == lifespan) {
-				state = State.Terminated;
+				state = State.TERMINATED;
 				died = Watch.getTime();
 			}
 		}
-	}
-	
-	public void setScheduler(Scheduler scheduler) {
-		this.scheduler = scheduler;
 	}
 	
 	public int getSpawn() {
@@ -83,34 +80,35 @@ public class Job {
 	}
 	
 	public boolean isNew() {
-		if (this.state == State.New)
+		if (this.state == State.NEW)
 			return true;
 		else
 			return false;
 	}
 	
 	public boolean isRunning() {
-		if (this.state == State.Running)
+		if (this.state == State.RUNNING)
 			return true;
 		else
 			return false;
 	}
 
 	public boolean isWaiting() {
-		if (this.state == State.Waiting)
+		if (this.state == State.WAITING)
 			return true;
 		else
 			return false;		
 	}
 	
 	public boolean isTerminated() {
-		if (this.state == State.Terminated) 
+		if (this.state == State.TERMINATED) 
 			return true;
 		else 
 			return false;
 	}
 	
+	//Simula uma interrupção
 	public void pause() {
-		this.state = State.Waiting;
+		this.state = State.WAITING;
 	}
 }

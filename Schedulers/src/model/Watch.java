@@ -9,7 +9,7 @@ public class Watch {
 		started = new Date().getTime();
 	}
 	
-	public static int getReal() {
+	public synchronized static int getReal() {
 		return (int)((new Date().getTime()) % started);
 	}
 	

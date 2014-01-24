@@ -28,23 +28,15 @@ public class Clock extends Thread {
 		});
 		
 		jobs = jobList;
-		
-		for (Job job : jobList) {
-			job.setScheduler(scheduler);
-		}
 	}
 	
 	public void run() {
-		synchronized (this) { 
-			while (!jobs.isEmpty()) {
-				try {
-					scheduler.schedule(spawn(Watch.getTime()));
-					sleep(Watch.getAmount());
-				} catch (InterruptedException e) {
-					System.out.println("ERRO");
-				}
-				
-				notifyAll();
+		while (!jobs.isEmpty()) {
+			try {
+				scheduler.schedule(spawn(Watch.getTime()));
+				sleep(Watch.getAmount());
+			} catch (InterruptedException e) {
+				System.out.println("ERRO");
 			}
 		}
 	}

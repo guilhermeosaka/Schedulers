@@ -15,14 +15,14 @@ public class FixedPriority extends Scheduler {
 		this.preemptive = preemptive;
 		debugProcess = 0;
 	}
-
+ 
 	@Override
 	public void schedule(List<Job> fresh) throws InterruptedException {
 		synchronized (this) {
 			Job job = runnable.peek();
-			//Insere os jobs novos na fila de jobs prontos ou em espera
+			//Insere os jobs novos na fila 'runnable'
 			runnable = merge(runnable, fresh);
-			if (job != null) { 
+			if (job != null) {
 				if (runnable.peek() != job) {
 					job.pause(); //Caso alguma job nova tenha maior prioridade, pausar a job em execução
 				}
@@ -30,38 +30,9 @@ public class FixedPriority extends Scheduler {
 			notify();
 		}
 	}
-
-
-	@Override
-	public Job getJob() throws InterruptedException {
-		synchronized (this) {
-			if(preemptive) {
-				while (runnable.isEmpty()) {
-					wait();
-				}
-				
-				Job job = runnable.peek();
-				
-				if (job.isTerminated()) {
-					runnable.remove(job);
-					job = null;
-				}
-				
-				notify();
-				return job;
-			} else {
-				return null;
-			}
-		}
-	}
 	
 	public boolean remove(Job job) {
 		return runnable.remove(job);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return runnable.isEmpty();
 	}
 	
 	public Queue<Job> merge(Queue<Job> old, List<Job> fresh) {

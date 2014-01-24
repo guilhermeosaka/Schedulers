@@ -20,13 +20,14 @@ public class Processor extends Thread {
 		this.terminated = new LinkedList<>();
 	}
 	
+	//Executa as jobs da fila do scheduler
 	public void run() {
 		while(!finished) {
 			try {
 				job = scheduler.getJob();
 				if (job != null) {
 					job.run();
-				}
+				} 
 				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
