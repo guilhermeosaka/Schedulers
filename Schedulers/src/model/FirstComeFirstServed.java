@@ -6,14 +6,17 @@ import java.util.Queue;
 public class FirstComeFirstServed extends Scheduler {
 
 	@Override
-	public synchronized void schedule(List<Job> fresh) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public Queue<Job> merge(Queue<Job> old, List<Job> fresh) {
-		// TODO Auto-generated method stub
-		return null;
+		while(!fresh.isEmpty())// enquanto não estiver vazia
+		{
+			old.add(fresh.remove(0));
+		}
+		
+		return old;
+	}
+	
+	@Override
+	public String toString() {
+		return "Por chegada";
 	}
 }

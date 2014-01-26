@@ -1,16 +1,26 @@
-import javax.swing.SwingUtilities;
-
-import model.Model;
-import view.View;
-import controller.Controller;
+import javax.swing.JApplet;
 
 
-public class Executor {
+public class Executor extends JApplet {
 
-	public static void main(String[] args) {
-		Model model = new Model();
-		View view = new View();
-		Controller controller = new Controller(model, view);
-		controller.start();
+	@Override
+	public void destroy() {
+		System.out.println("destroy");
 	}
+
+	@Override
+	public void init() {
+		System.out.println("init");
+	}
+
+	@Override
+	public void start() {
+		System.out.println("start");
+	}
+
+	@Override
+	public void stop() {
+		System.out.println("stop");
+	}
+	
 }

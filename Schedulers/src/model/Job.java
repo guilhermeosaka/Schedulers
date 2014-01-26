@@ -42,6 +42,7 @@ public class Job {
 		}
 		state = State.RUNNING;
 		while (state == State.RUNNING) {
+			System.out.println(Watch.getReal() + " - Rodando " + id);
 			Thread.sleep(Watch.getAmount() + Controller.SYNCHRONIZE);
 			age++;
 			if (age == lifespan) {

@@ -13,7 +13,7 @@ public class Model {
 														new FixedPriority(false),
 														new FixedPriority(true),
 														new RoundRobin(false, 2),
-														new RoundRobin(true, 5) });
+														new RoundRobin(true, 2) });
 	}
 	
 	public List<Scheduler> getSchedulerList() {

@@ -1,8 +1,15 @@
 package controller;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JApplet;
+import javax.swing.Timer;
 
 import model.Job;
 import model.Model;
@@ -10,69 +17,77 @@ import model.Scheduler;
 import model.Watch;
 import view.View;
 
-public class Controller extends Thread {
-	private Model model;
-	private View view;
+
+public class Controller extends JApplet implements ActionListener {
+
 	public final static int SYNCHRONIZE = 5;
 	
-	private List<Processor> processor;
-	private List<Clock> clock;
+	Model model;
+	View view;
+	List<Processor> processors;
+	List<Clock> clocks;
+	Timer timer;
 	
-	public Controller(Model model, View view) {
-		this.model = model;
-		this.view = view;
+	@Override
+	public void destroy() {
+		System.out.println("destroy");
+	}
+
+	@Override
+	public void init() {
+		model = new Model();
+		view = new View();
+		
 		try {
-			processor = new ArrayList<>();
-			clock = new ArrayList<>();
-			String path = "repository/jobs.txt";
+			processors = new ArrayList<>();
+			clocks = new ArrayList<>();
+			String path = "C:\\Users\\Guilherme\\git\\SchedulersRepository\\Schedulers\\repository\\jobs.txt";
 			for (Scheduler scheduler : model.getSchedulerList()) {
 				//Gera a lista de jobs a partir do arquivo (repository/jobs.txt)
 				List<Job> jobList = model.getJobList(path);
 				
-				clock.add(new Clock(scheduler, jobList));
-				processor.add(new Processor(scheduler));
+				clocks.add(new Clock(scheduler, jobList));
+				processors.add(new Processor(scheduler));
 			}
 		} catch (IOException e) {
 			//Grava log e mostra na tela
 			System.out.println(e.getMessage());
 		}
 		
-		Watch.start();
-		processor.get(3).start();
-		clock.get(3).start();
+		setLayout(new BorderLayout());
+		
+		add(view, BorderLayout.CENTER);
+		
+		System.out.println("init");
+		stop();
 	}
-	
-	public void run() {
-		while (true) {
-			
-			try {
-				sleep(10);
-				System.out.print(Watch.getTime() + " - ");
-				String message;
-				if (processor.get(3).getJob() != null) 
-					message = Integer.toString(processor.get(3).getJob().getId());
-				else
-					message = "Não há processos";
-				System.out.println(message);
-				
-				sleep(Watch.getAmount());
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
+	@Override
+	public void start() {
+		timer = new Timer(19, this);
+		
+		Watch.start();
+		for (int i = 0; i < 6; i++) {
+			processors.get(i).start();
+			clocks.get(i).start();
 		}
-	}
-	
-	public void startAll() {
-		Watch.start();
-		for (Thread c : clock)
-			c.start();
+		timer.start();
 		
-		for (Thread p : processor)
-			p.start();
+		System.out.println("start");
 	}
+
+	@Override
+	public void stop() {
+		System.out.println("stop");
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if (!view.isFinished()) {
+			view.update(processors);
+		} else { 
+			//terminou!
+		}
 	
-	public void pause() {
-		
 	}
 }

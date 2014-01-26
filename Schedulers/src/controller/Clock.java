@@ -31,7 +31,7 @@ public class Clock extends Thread {
 	}
 	
 	public void run() {
-		while (!jobs.isEmpty()) {
+		while (true) {
 			try {
 				scheduler.schedule(spawn(Watch.getTime()));
 				sleep(Watch.getAmount());
@@ -39,6 +39,7 @@ public class Clock extends Thread {
 				System.out.println("ERRO");
 			}
 		}
+		
 	}
 	
 	public List<Job> spawn(int seconds) {

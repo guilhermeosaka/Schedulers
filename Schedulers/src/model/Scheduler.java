@@ -5,18 +5,36 @@ import java.util.List;
 import java.util.Queue;
 
 public abstract class Scheduler {
+	boolean preemptive;
 	Job job;
 	Queue<Job> runnable;
-	List<Job> terminated;
-	List<Job> waiting; 
 	
 	public Scheduler() {
 		this.runnable = new LinkedList<>();
-		this.terminated = new LinkedList<>();
+		this.preemptive = false;
+	}
+	
+	public Scheduler(boolean preemptive) {
+		this.runnable = new LinkedList<>();
+		this.preemptive = preemptive;
 	}
 	
 	//Enfileira a job na fila 'runnable'. As interrupções (Job.pause()) dos jobs são realizadas no escopo deste método.
-	public abstract void schedule(List<Job> job) throws InterruptedException;
+	//public abstract void schedule(List<Job> job) throws InterruptedException;
+	
+	public void schedule(List<Job> fresh) throws InterruptedException {
+		synchronized (this) {
+			Job job = runnable.peek();
+			//Insere os jobs novos na fila 'runnable'
+			runnable = merge(runnable, fresh);
+			if (job != null && preemptive) {
+				if (runnable.peek() != job) {
+					job.pause(); //Caso alguma job nova tenha maior prioridade, pausar a job em execução
+				}
+			}
+			notify();
+		}
+	}
 	
 	//Obtém o primeiro job da fila 'runnable', e deve excluir se estiver com status de "TERMINATED"
 	public Job getJob() throws InterruptedException {
@@ -47,10 +65,6 @@ public abstract class Scheduler {
 	
 	public synchronized Queue<Job> getRunnable() {
 		return runnable;
-	}
-	
-	public synchronized List<Job> getTerminated() {
-		return terminated;
 	}
 	
 	public abstract Queue<Job> merge(Queue<Job> old, List<Job> fresh);
